@@ -10,7 +10,8 @@ def init_db(db_name="movies.db"):
             title TEXT NOT NULL,
             release_date TEXT,
             vote_average REAL,
-            genres TEXT
+            genres TEXT,
+            poster_path TEXT
         )
     ''')
 
@@ -22,14 +23,15 @@ def insert_movie(movie, db_name="movies.db"):
     cursor = conn.cursor()
 
     cursor.execute('''
-        INSERT OR IGNORE INTO movies (id, title, release_date, vote_average, genres)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT OR IGNORE INTO movies (id, title, release_date, vote_average, genres, poster_path)
+        VALUES (?, ?, ?, ?, ?, ?)
     ''', (
         movie["id"],
         movie["title"],
         movie.get("release_date"),
         movie.get("vote_average"),
-        ", ".join(movie.get("genres", []))
+        ", ".join(movie.get("genres", [])),
+        movie.get("poster_path")
     ))
 
     conn.commit()

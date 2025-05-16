@@ -4,7 +4,7 @@ import sqlite3
 import matplotlib.pyplot as plt
 import japanize_matplotlib
 
-@st.cache_data
+#@st.cache_data
 def load_data():
     conn = sqlite3.connect("movies.db")
     query = '''
@@ -44,12 +44,32 @@ filtered_df = df[
 grouped = filtered_df.groupby(["year", "genre"])["vote_average"].mean().reset_index()
 pivot = grouped.pivot(index="year", columns="genre", values="vote_average")
 
-# 描画
-fig, ax = plt.subplots(figsize=(12, 6))
-pivot.plot(ax=ax)
-ax.set_xlabel("公開年")
-ax.set_ylabel("平均スコア")
-ax.set_title("ジャンル別の平均評価スコアの推移")
-ax.legend(title="ジャンル")
+# --- すでにある部分 ---
+grouped = filtered_df.groupby(["year", "genre"])["vote_average"].mean().reset_index()
+pivot = grouped.pivot(index="year", columns="genre", values="vote_average")
+
+# 年ごとの映画数をジャンルごとに集計
+count_grouped = filtered_df.groupby(["year", "genre"]).size().reset_index(name="movie_count")
+count_pivot = count_grouped.pivot(index="year", columns="genre", values="movie_count")
+
+# --- 描画 ---
+fig, ax1 = plt.subplots(figsize=(12, 6))
+
+# 評価スコア（左軸）
+pivot.plot(ax=ax1)
+ax1.set_xlabel("公開年")
+ax1.set_ylabel("平均スコア")
+ax1.set_title("ジャンル別の平均評価スコアと映画本数の推移")
+
+# 映画本数（右軸）を破線グラフで重ねる
+ax2 = ax1.twinx()
+count_pivot.plot(ax=ax2, linestyle="--", alpha=0.3)
+ax2.set_ylabel("映画本数")
+
+# 凡例調整
+ax1.legend(title="ジャンル（スコア）", loc="upper left")
+ax2.legend(title="ジャンル（本数）", loc="upper right")
+
 st.pyplot(fig)
+
 

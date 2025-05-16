@@ -22,20 +22,26 @@ def insert_movie(movie, db_name="movies.db"):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
 
-    cursor.execute('''
-        INSERT OR IGNORE INTO movies (id, title, release_date, vote_average, genres, poster_path)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (
-        movie["id"],
-        movie["title"],
-        movie.get("release_date"),
-        movie.get("vote_average"),
-        ", ".join(movie.get("genres", [])),
-        movie.get("poster_path")
-    ))
+    try:
+        cursor.execute('''
+            INSERT OR IGNORE INTO movies (id, title, release_date, vote_average, genres, poster_path)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (
+            movie["id"],
+            movie["title"],
+            movie.get("release_date"),
+            movie.get("vote_average"),
+            ", ".join(movie.get("genres", [])),
+            movie.get("poster_path", "")
+        ))
+    except Exception as e:
+        print(f"⚠️ insert_movie() エラー: {movie.get('title')} | {e}")
 
-    conn.commit()
-    conn.close()
+    finally:
+        conn.commit()
+        conn.close()
+
+
 
 if __name__ == "__main__":
     init_db()

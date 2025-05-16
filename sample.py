@@ -38,7 +38,8 @@ def fetch_movies_by_page(region="JP", start_year=2020, end_year=2020, pages=3):
                 "title": movie["title"],
                 "release_date": movie.get("release_date", ""),
                 "vote_average": movie.get("vote_average", 0),
-                "genres": genre_names
+                "genres": genre_names,
+                "poster_path": movie.get("poster_path", "")
             }
             all_movies.append(movie_data)
 
